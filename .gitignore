@@ -1,3 +1,4 @@
+# OCaml
 *.annot
 *.cmo
 *.cma
@@ -7,23 +8,42 @@
 *.cmx
 *.cmxs
 *.cmxa
-
-# ocamlbuild working directory
 _build/
-
-# ocamlbuild targets
 *.byte
 *.native
-
-# oasis generated files
 setup.data
 setup.log
-
-# Merlin configuring file for Vim and Emacs
 .merlin
-
-# Dune generated files
 *.install
-
-# Local OPAM switch
 _opam/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnp/
+.pnp.js
+
+# ReScript
+.bsb.lock
+lib/bs/
+*.bs.js
+
+# Webpack
+/public/bundle.js
+
+# Nix
+result
+result-*
+.direnv/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

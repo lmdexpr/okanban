@@ -1,0 +1,33 @@
+rescript = 1
+g_finger := /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/@rescript/react/lib/ocaml/install.stamp
+g_finger := /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/bs-fetch/lib/ocaml/install.stamp
+rule astj
+  command = /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/rescript/darwinarm64/bsc.exe  -warn-error +101 -bs-v 10.1.4 -bs-jsx 3  -absname -bs-ast -o $out $i
+o src/Api.ast : astj ../../src/Api.res
+rule deps
+  command = /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/rescript/darwinarm64/bsb_helper.exe -hash 4c733adb7e727429b652672ef75c2850 $in
+  restat = 1
+o src/Api.d : deps src/Api.ast
+rule mij
+  command = /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/rescript/darwinarm64/bsc.exe -I src -I /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/@rescript/react/lib/ocaml -I /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/bs-fetch/lib/ocaml   -warn-error +101 -bs-package-name okanban-client -bs-package-output es6:$in_d:.bs.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o src/Api.cmj src/Api.cmi ../../src/Api.bs.js : mij src/Api.ast
+o src/Card.ast : astj ../../src/Card.res
+o src/Card.d : deps src/Card.ast
+o src/Card.cmj src/Card.cmi ../../src/Card.bs.js : mij src/Card.ast
+o src/Board.ast : astj ../../src/Board.res
+o src/Board.d : deps src/Board.ast
+o src/Board.cmj src/Board.cmi ../../src/Board.bs.js : mij src/Board.ast
+o src/Index.ast : astj ../../src/Index.res
+o src/Index.d : deps src/Index.ast
+o src/Index.cmj src/Index.cmi ../../src/Index.bs.js : mij src/Index.ast
+o src/Types.ast : astj ../../src/Types.res
+o src/Types.d : deps src/Types.ast
+o src/Types.cmj src/Types.cmi ../../src/Types.bs.js : mij src/Types.ast
+o src/Column.ast : astj ../../src/Column.res
+o src/Column.d : deps src/Column.ast
+o src/Column.cmj src/Column.cmi ../../src/Column.bs.js : mij src/Column.ast
+o src/CardForm.ast : astj ../../src/CardForm.res
+o src/CardForm.d : deps src/CardForm.ast
+o src/CardForm.cmj src/CardForm.cmi ../../src/CardForm.bs.js : mij src/CardForm.ast

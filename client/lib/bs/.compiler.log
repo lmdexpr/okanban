@@ -1,0 +1,51 @@
+#Start(1746760821334)
+
+  Warning number 27
+  /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/src/Api.res:145:24-27
+
+  143 ┆ )
+  144 ┆ ->Js.Promise.then_(Fetch.Response.json, _)
+  145 ┆ ->Js.Promise.then_(json => {
+  146 ┆   resolve(. card)
+  147 ┆   Js.Promise.resolve(card)
+
+  unused variable json.
+
+
+  Warning number 27
+  /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/src/Api.res:176:24-27
+
+  174 ┆ )
+  175 ┆ ->Js.Promise.then_(Fetch.Response.json, _)
+  176 ┆ ->Js.Promise.then_(json => {
+  177 ┆   resolve(. ())
+  178 ┆   Js.Promise.resolve(())
+
+  unused variable json.
+
+
+  Warning number 27
+  /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/src/Api.res:198:24-31
+
+  196 ┆   ),
+  197 ┆ )
+  198 ┆ ->Js.Promise.then_(response => {
+  199 ┆   resolve(. ())
+  200 ┆   Js.Promise.resolve(())
+
+  unused variable response.
+
+
+  Warning number 3
+  /Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/src/Index.res:3:5-19
+
+  1 │ switch (ReactDOM.querySelector("#root")) {
+  2 │ | Some(rootElement) => {
+  3 │     ReactDOM.render(
+  4 │       <Board />,
+  5 │       rootElement
+
+  deprecated: ReactDOM.render
+  ReactDOM.render is no longer supported in React 18. Use ReactDOM.Client.createRoot instead.
+
+#Done(1746760821465)

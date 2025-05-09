@@ -1,0 +1,1 @@
+let () = Okanban.Server.start ()

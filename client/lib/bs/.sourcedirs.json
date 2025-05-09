@@ -1,0 +1,1 @@
+{ "dirs" : [ "src" ] , "pkgs" : [ [ "bs-fetch" , "/Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/bs-fetch" ] , [ "@rescript/react" , "/Users/yuki.tajiri/Workspace/github/lmdexpr/okanban/client/node_modules/@rescript/react" ] ] , "generated" : [] }

@@ -1,0 +1,4 @@
+(library
+ (name okanban)
+ (libraries dream yojson)
+ (preprocess (pps ppx_deriving_yojson ppx_fields_conv)))
