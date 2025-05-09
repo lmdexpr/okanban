@@ -89,15 +89,6 @@
             nodePackages.webpack
             nodePackages.webpack-cli
           ];
-          
-          shellHook = ''
-            echo "OKanban development environment"
-            echo "Run 'dune build' to build the OCaml backend"
-            echo "Run 'cd client && npm install' to install frontend dependencies"
-            echo "Run 'cd client && npm run build' to build the ReScript code"
-            echo "Run 'cd client && npm run webpack' to build the frontend bundle"
-            echo "Run 'dune exec okanban' to start the server"
-          '';
         };
       }
     );

@@ -1,4 +1,5 @@
 open Model
+open Lwt.Infix
 
 (* API handlers *)
 let get_board_handler _request =
@@ -6,7 +7,7 @@ let get_board_handler _request =
   Dream.json (Yojson.Safe.to_string json)
 
 let create_card_handler request =
-  let%lwt body = Dream.body request in
+  Dream.body request >>= fun body ->
   try
     let json = Yojson.Safe.from_string body in
     let column_id = Dream.param request "column_id" in
@@ -35,28 +36,28 @@ let create_card_handler request =
     
     match add_card column_id card with
     | Ok card -> Dream.json (Yojson.Safe.to_string (card_to_yojson card))
-    | Error msg -> Dream.response ~status:`Bad_Request msg
+    | Error msg -> Lwt.return @@ Dream.response ~status:`Bad_Request msg
   with e ->
-    Dream.response ~status:`Bad_Request (Printexc.to_string e)
+    Lwt.return @@ Dream.response ~status:`Bad_Request (Printexc.to_string e)
 
 let update_card_handler request =
-  let%lwt body = Dream.body request in
+  Dream.body request >>= fun body ->
   try
     let json = Yojson.Safe.from_string body in
     let card_id = Dream.param request "card_id" in
-    let card_json = card_of_yojson json in
+    let card_json = card_of_yojson json |> Result.get_ok in
     
     if card_id <> card_json.id then
-      Dream.response ~status:`Bad_Request "Card ID mismatch"
+      Lwt.return @@ Dream.response ~status:`Bad_Request "Card ID mismatch"
     else
       match update_card card_json with
       | Ok card -> Dream.json (Yojson.Safe.to_string (card_to_yojson card))
-      | Error msg -> Dream.response ~status:`Bad_Request msg
+      | Error msg -> Lwt.return @@ Dream.response ~status:`Bad_Request msg
   with e ->
-    Dream.response ~status:`Bad_Request (Printexc.to_string e)
+    Lwt.return @@ Dream.response ~status:`Bad_Request (Printexc.to_string e)
 
 let move_card_handler request =
-  let%lwt body = Dream.body request in
+  Dream.body request >>= fun body ->
   try
     let json = Yojson.Safe.from_string body in
     let card_id = Dream.param request "card_id" in
@@ -65,38 +66,50 @@ let move_card_handler request =
     
     match move_card card_id from_column_id to_column_id with
     | Ok card -> Dream.json (Yojson.Safe.to_string (card_to_yojson card))
-    | Error msg -> Dream.response ~status:`Bad_Request msg
+    | Error msg -> Lwt.return @@ Dream.response ~status:`Bad_Request msg
   with e ->
-    Dream.response ~status:`Bad_Request (Printexc.to_string e)
+    Lwt.return @@ Dream.response ~status:`Bad_Request (Printexc.to_string e)
 
 let delete_card_handler request =
   let card_id = Dream.param request "card_id" in
   match delete_card card_id with
   | Ok _ -> Dream.empty `OK
-  | Error msg -> Dream.response ~status:`Bad_Request msg
+  | Error msg -> Lwt.return @@ Dream.response ~status:`Bad_Request msg
 
 (* Webhook reminder background task *)
 let reminder_task () =
   let rec loop () =
-    let%lwt () = Lwt_unix.sleep 60.0 in (* Check every minute *)
+    Lwt_unix.sleep 60.0 >>= fun () ->
     let due_cards = check_due_cards () in
-    let%lwt _ = 
-      Lwt_list.iter_p (fun card ->
-        let%lwt success = send_webhook card in
-        if success then
-          Dream.log "Sent reminder webhook for card %s" card.id
-        else
-          Dream.log "Failed to send reminder webhook for card %s" card.id;
-        Lwt.return_unit
-      ) due_cards
-    in
+    Lwt_list.iter_p (fun card ->
+      send_webhook card >>= fun success ->
+      if success then
+        Dream.log "Sent reminder webhook for card %s" card.id
+      else
+        Dream.log "Failed to send reminder webhook for card %s" card.id;
+      Lwt.return_unit
+    ) due_cards
+    >>= fun () ->
     loop ()
   in
   loop ()
 
-(* Static file handler *)
-let static_handler path =
-  Dream.static ~loader:(Dream.from_filesystem path) "/"
+let index _ =
+  Dream.html "\
+<!DOCTYPE html>\
+<html lang=\"en\">\
+<head>\
+  <meta charset=\"UTF-8\">\
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\
+  <title>OKanban - Simple Kanban App</title>\
+  <link rel=\"stylesheet\" href=\"/static/styles.css\">\
+</head>\
+<body>\
+  <div id=\"root\"></div>\
+  <script src=\"/static/bundle.js\"></script>\
+</body>\
+</html>\
+"
 
 (* Server setup *)
 let start () =
@@ -108,8 +121,9 @@ let start () =
   Dream.run
   @@ Dream.logger
   @@ Dream.router [
-    Dream.get "/" (static_handler "public/index.html");
-    Dream.get "/static/**" (static_handler "public");
+    Dream.get "/" index;
+
+    Dream.get "/static/**" (Dream.static "public");
     
     (* API routes *)
     Dream.get "/api/board" get_board_handler;
@@ -118,4 +132,3 @@ let start () =
     Dream.post "/api/cards/:card_id/move" move_card_handler;
     Dream.delete "/api/cards/:card_id" delete_card_handler;
   ]
-  @@ Dream.not_found
